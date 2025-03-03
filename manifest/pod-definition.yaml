@@ -6,7 +6,16 @@ metadata:
         app: myapp
         type: front-end
 spec:
-    # nodeName: node01 # Assign pod to specific node
+    nodeName: node01 # Assign pod to specific node
     containers:
       - name: nginx-container
         image: nginx
+        ports:
+            - containerPort: 8080
+        resources:
+            request:
+                memory: 2G
+                cpu: 1
+            limits:
+                memory: 3G
+                cpu: 3
