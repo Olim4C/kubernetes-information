@@ -80,3 +80,42 @@ kubectl delete -f nginx.yaml
 ```bash
 kubectl apply -f nginx.yaml
 ```
+
+# Static Pods
+
+## kubelet.service
+
+### Option1
+```bash
+ExecStart=/usr/local/bin/kubelet \\
+    --container-runtime=remote \\
+    --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \\
+    --pod-manifest-path=/etc/kubernetes/manifest \\
+    --kubeconfig=/var/lib/kubelet/kubeconfig \\
+    --network-plugin=cni \\
+    --register-node=true \\
+    --v=2
+```
+
+### Option 2
+```bash
+ExecStart=/usr/local/bin/kubelet \\
+    --container-runtime=remote \\
+    --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \\
+    --config=kubeconfig.yaml \\
+    --kubeconfig=/var/lib/kubelet/kubeconfig \\
+    --network-plugin=cni \\
+    --register-node=true \\
+    --v=2
+```
+when we use this option we have to configure the kubeconfig.yaml
+```yaml
+staticPodPath: /etc/kubernetes/manifest
+```
+
+## Static Pod vs DaemonSets
+| Static PODs | DaemonSets |
+|-------------|------------|
+| Created by the kubelet | Created by the kube-API server (DaemonSet Controller) |
+| Deploy Control Plane components as Static Pods | Deploy Monitoring Agents, Logging Agents on nodes |
+| **Ignored by the Kube-scheduler** | **Ignored by the Kube-scheduler** |
