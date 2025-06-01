@@ -37,6 +37,9 @@ kubectl create deployment --image=<dockerimage> <deployment_name> --dry-run=clie
 kubectl create deployment --image=<dockerimage> <deployment_name> --replicas=4 --dry-run=client -o yaml
 ```
 ```bash
+kubectl create configmap <configmap_name> --from-file=<file_directory>
+```
+```bash
 kubectl delete -f <nombre_yaml_file_manifiesto>
 ```
 
@@ -119,3 +122,57 @@ staticPodPath: /etc/kubernetes/manifest
 | Created by the kubelet | Created by the kube-API server (DaemonSet Controller) |
 | Deploy Control Plane components as Static Pods | Deploy Monitoring Agents, Logging Agents on nodes |
 | **Ignored by the Kube-scheduler** | **Ignored by the Kube-scheduler** |
+
+## Cluster maintenance
+
+Drain a node and move the pods to another node and make the current node not schedule new pods
+```bash
+kubectl drain <node_name>
+```
+
+uncordon a node and make it as schedulable
+```bash
+kubectl uncordon <node_name>
+```
+
+cordon a node to avoid scheduling new pods in that node
+```bash
+kubectl cordon <node_name>
+```
+
+switch clusters
+```bash
+kubectl config use-context <cluster_name>
+```
+
+## Certificates
+
+### Create certificates
+To create a certificate you have to follow the following steps
+
+1. **Generate a key**
+```bash
+openssl genrsa -out ca.key 2048
+```
+
+2. **Generate a Certificate Signing Request (We have to specify the key created before)**
+```bash
+openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr
+```
+
+3. **Sign Certificates (We have to specify the Signing Request and the key)**
+```bash
+openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+```
+
+
+### Get more information about certain certificate
+```bash
+openssl x509 -in /etc/kubernetes/pki/apiserver.crt -test -noout
+```
+
+### Inspect Logs
+
+```bash
+kubectl logs etcd-master
+```
